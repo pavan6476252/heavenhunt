@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "802081621991",
+    "project_id": "heaven-hunt-63924",
+    "storage_bucket": "heaven-hunt-63924.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:802081621991:android:98ac19f1a4a5018c649f42",
+        "android_client_info": {
+          "package_name": "com.meesalapavan.heavenhunt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "802081621991-s25fo7m46qnntv53m8s8iisfu7ns420b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrJ5MGcorfyz-8TTUvFDuq6P0P9f1ulLI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "802081621991-s25fo7m46qnntv53m8s8iisfu7ns420b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
