@@ -1,10 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:heavenhunt/screens/sub_screens/accomodation_view.dart';
+import 'package:heavenhunt/screens/sub_screens/other_services_view.dart';
 import 'package:heavenhunt/screens/utils.dart';
-import 'package:heavenhunt/services/location_services.dart';
-
+import 'package:rive/rive.dart';
 import '../models/accomodation_model.dart';
 import '../models/other_service.dart';
 import '../services/firebase_services.dart';
@@ -20,9 +20,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   final TextEditingController locationController = TextEditingController();
 
   void initState() {
-    // TODO: implement initState
     super.initState();
-    // fetchLocationData();
 
     _getCurrentLocation();
   }
@@ -51,54 +49,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
     fetchData(locationController.text);
     setState(() {});
   }
-  // void fetchLocationData() async {
-  //   // Request location permission
-  //   final LocationPermission permission = await Geolocator.requestPermission();
-
-  //   try {
-  //     if (permission == LocationPermission.always ||
-  //         permission == LocationPermission.whileInUse) {
-  //       final Position position = await Geolocator.getCurrentPosition(
-  //         desiredAccuracy: LocationAccuracy.high,
-  //       );
-
-  //       _getCurrentPosition();
-  //     }
-  //   } catch (err) {
-  //     Utils.showSnackbar(context: context, text: "Erro fetching location");
-  //   }
-  // }
-
-  // Future<void> _getCurrentPosition() async {
-  //   final hasPermission =
-  //       await LocationServices.handleLocationPermission(context);
-  //   if (!hasPermission) return;
-  //   await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-  //       .then((Position position) {
-  //     setState(() => _currentPosition = position);
-  //     _getAddressFromLatLng(position);
-  //   }).catchError((e) {
-  //     Utils.showSnackbar(
-  //         context: context, text: "Error while getting Location");
-  //   });
-  // }
-
-  // Future<void> _getAddressFromLatLng(Position position) async {
-  //   await placemarkFromCoordinates(
-  //           _currentPosition!.latitude, _currentPosition!.longitude)
-  //       .then((List<Placemark> placemarks) {
-  //     Placemark place = placemarks[0];
-  //     setState(() {
-  //       locationController.text =
-  //           '${place.street}, ${place.subLocality},${place.subAdministrativeArea}, ${place.postalCode}';
-  //     });
-  //     fetchData();
-  //   }).catchError((e) {
-  //     Utils.showSnackbar(
-  //         context: context, text: "Error while getting address name");
-  //     print(e);
-  //   });
-  // }
 
   showSheet() {
     return showModalBottomSheet<void>(
@@ -110,17 +60,17 @@ class _ExploreScreenState extends State<ExploreScreen> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 ListTile(
-                  leading: Icon(Icons.add),
-                  title: Text('Add Room Info'),
+                  leading: const Icon(Icons.add),
+                  title: const Text('Add Room Info'),
                   onTap: () {
                     Navigator.pop(context); // Close the bottom sheet
                     Navigator.pushNamed(context, '/add-room');
                   },
                 ),
-                Divider(),
+                const Divider(),
                 ListTile(
-                  leading: Icon(Icons.food_bank),
-                  title: Text('Add Local Food service info'),
+                  leading: const Icon(Icons.food_bank),
+                  title: const Text('Add Local Food service info'),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.pushNamed(context, '/post-food-services');
@@ -174,7 +124,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
         ),
       ),
       body: isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : Padding(
@@ -182,12 +132,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Nearby Accommodation Listings:'),
-                  SizedBox(height: 8.0),
-                  buildAccommodationList(),
-                  SizedBox(height: 16.0),
-                  Text('Nearby Other Services:'),
-                  SizedBox(height: 8.0),
+                  const Text('Nearby Accommodation Listings:'),
+                  const SizedBox(height: 8.0),
+                  SizedBox(
+                      height: 200,
+                      width: double.maxFinite,
+                      child: buildAccommodationList()),
+                  const SizedBox(height: 16.0),
+                  const Text('Nearby Other Services:'),
+                  const SizedBox(height: 8.0),
                   // buildOtherServicesList(),
                   Expanded(
                     child: YourScreen(
@@ -202,49 +155,55 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   Widget buildAccommodationList() {
     if (nearbyAccommodationListings.isEmpty) {
-      return Text('No nearby accommodation listings found.');
+      return const Text('No nearby accommodation listings found.');
     }
 
     return GridView.builder(
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, // Number of columns in the grid
+      scrollDirection: Axis.horizontal,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 1, // Number of columns in the grid
         crossAxisSpacing: 8.0, // Spacing between columns
         mainAxisSpacing: 8.0, // Spacing between rows
       ),
       itemCount: nearbyAccommodationListings.length,
       itemBuilder: (context, index) {
         final listing = nearbyAccommodationListings[index];
-        return Card(
-          // Customize card styling
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch, //add this
-            children: [
-              Image.network(
-                listing.images[0], // Replace with image
-                height: 120, // Customize image height
-                width: double.infinity, // Make image full width
-                fit: BoxFit.cover, // Fit the image within the space
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      listing.type,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Text(
-                      'Rent: \$${listing.rent.toStringAsFixed(2)}',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ],
+        return InkWell(
+          onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AccomodationView(listing:listing),
+              )),
+        
+          child: Card(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch, //add this
+              children: [
+                Image.network(
+                  listing.images[0], // Replace with image
+                  height: 120, // Customize image height
+                  width: double.infinity, // Make image full width
+                  fit: BoxFit.cover, // Fit the image within the space
                 ),
-              )
-            ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        listing.type,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      Text(
+                        'Rent: \$${listing.rent.toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         );
       },
@@ -253,13 +212,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   Widget buildOtherServicesList() {
     if (nearbyOtherServices.isEmpty) {
-      return Text('No nearby other services found.');
+      return const Text('No nearby other services found.');
     }
 
     return GridView.builder(
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2, // Number of columns in the grid
         crossAxisSpacing: 8.0, // Spacing between columns
         mainAxisSpacing: 8.0, // Spacing between rows
@@ -286,11 +245,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   children: [
                     Text(
                       service.type,
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
                     Text(
                       'Rating: ${service.rating.toStringAsFixed(2)}',
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                     ),
                   ],
                 ),
@@ -301,7 +260,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       },
     );
   }
-} 
+}
 
 class YourScreen extends StatelessWidget {
   final List<OtherService> nearbyOtherServices;
@@ -326,8 +285,12 @@ class YourScreen extends StatelessWidget {
       length: OtherServiceTypes.length,
       child: Column(
         children: [
-          TabBar(
-            tabs: OtherServiceTypes.map((type) => Tab(text: type)).toList(),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: TabBar(
+              isScrollable: true, // Make the tab bar scrollable
+              tabs: OtherServiceTypes.map((type) => Tab(text: type)).toList(),
+            ),
           ),
           Expanded(
             child: TabBarView(
@@ -346,13 +309,13 @@ class YourScreen extends StatelessWidget {
 
   Widget buildOtherServicesList(List<OtherService> services) {
     if (services.isEmpty) {
-      return Center(child: Text('No services found for this type.'));
+      return const RiveAnimation.asset('assets/ani404.riv');
     }
 
     return GridView.builder(
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
@@ -360,34 +323,41 @@ class YourScreen extends StatelessWidget {
       itemCount: services.length,
       itemBuilder: (context, index) {
         final service = services[index];
-        return Card(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.network(
-                service.images.first,
-                height: 120,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      service.name,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Text(
-                      'Rating: ${service.rating.toStringAsFixed(2)}',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ],
+        return InkWell(
+          onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OtherServicesView(otherService:service),
+              )),
+          child: Card(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.network(
+                  service.images.first,
+                  height: 120,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
                 ),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        service.name,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      Text(
+                        'Rating: ${service.rating.toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },

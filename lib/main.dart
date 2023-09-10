@@ -136,7 +136,7 @@ class _SplashState extends State<Splash> {
   Future<void> _checkUserExistence() async {
     final exists = await UserProfile.checkUserAuth();
 
-    if (exists)
+    if (!exists)
       Navigator.pushReplacementNamed(context, '/home');
     else {
       Navigator.pushReplacementNamed(context, '/login');

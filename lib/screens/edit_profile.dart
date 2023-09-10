@@ -34,14 +34,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    fetchLocationData();
-    initFCM();
-    loadCollegesFromJson();
-    User? user = FirebaseAuth.instance.currentUser;
-    _nameController.text = user?.displayName ?? "";
-    _emailController.text = user?.email ?? "";
-    _photoController.text = user?.photoURL ?? "";
-    _phoneNumberController.text = user?.phoneNumber ?? "";
+    getData();
+    // fetchLocationData();
+    // // initFCM();
+    // loadCollegesFromJson();
+    // User? user = FirebaseAuth.instance.currentUser;
+  }
+
+  getData() async {
+    UserProfile? userProfile = await UserProfile.retrieveUserData();
+    _nameController.text = userProfile?.name ?? "";
+    _emailController.text = userProfile?.email ?? "";
+    _photoController.text = userProfile?.profilePictureUrl ?? "";
+    _phoneNumberController.text = userProfile?.phoneNumber ?? "";
+    _genderController.text = userProfile?.gender ?? "";
+    _collegeController.text = userProfile?.college ?? "";
+    setState(() {});
   }
 
   @override
@@ -236,11 +244,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           children: [
                             CircleAvatar(
                               radius: 60,
-                              backgroundImage: _photoController.text == ''
-                                  ? _image == null
-                                      ? null
-                                      : FileImage(_image!) as ImageProvider
-                                  : NetworkImage(_photoController.text),
+                              backgroundImage:
+                                  NetworkImage(_photoController.text),
+                              //  _photoController.text == ''
+                              //     ? _image == null
+                              //         ? null
+                              //         : FileImage(_image!) as ImageProvider
+                              //     : NetworkImage(_photoController.text),
                               child: IconButton(
                                 onPressed: () {
                                   pickImage();
@@ -414,7 +424,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  Future<void> initFCM() async {
+  Future<void> initFCMm() async {
     // Request permission for notifications
     NotificationSettings settings =
         await FirebaseMessaging.instance.requestPermission(

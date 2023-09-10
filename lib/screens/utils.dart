@@ -1,5 +1,7 @@
-import 'dart:io';
+// ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -59,6 +61,25 @@ class Utils {
     }
   }
 
+  static Future<void> makeCall(
+      {required BuildContext context, required String number}) async {
+    if (number == '') {
+      showSnackbar(context: context, text: "no location found");
+      return;
+    }
+    try {
+      var url = Uri.parse("tel:$number");
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      } else {
+        showSnackbar(context: context, text: "Unable to make call");
+      }
+    } catch (e) {
+      print(e);
+      showSnackbar(context: context, text: "Unable to open maps");
+    }
+  }
+
   //maps
   static Future<void> shareMsgTo({
     required BuildContext context,
@@ -90,6 +111,4 @@ class Utils {
       showSnackbar(context: context, text: "Unable to open launch");
     }
   }
-
-  
 }
